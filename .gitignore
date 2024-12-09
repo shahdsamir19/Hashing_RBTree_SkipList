@@ -1,0 +1,43 @@
+# Compiled Object files
+*.o
+*.obj
+*.lo
+*.la
+*.al
+*.a
+*.so
+*.dylib
+*.lib
+*.dll
+*.exe
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# CMake-generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+
+# IDE-specific files and directories
+.idea/
+*.iml
+
+# Logs and databases
+*.log
+*.tlog
+*.msg
+
+# CLion run configurations and caches
+cmake-build-*/
+.clion/
+
+# Temporary files
+*~
+*.swp
+*.tmp
+.DS_Store
+Thumbs.db
