@@ -294,6 +294,35 @@ int GameScores::getPlayerScore(string playerName) {
 }
 
 int main() {
+    skipList SkipList; // Creating the skip List
+
+    // Inserting the Data in skip list
+
+    SkipList.insert(10);
+    SkipList.insert(20);
+    SkipList.insert(30);
+    SkipList.insert(40);
+    SkipList.insert(50);
+
+    // Display skip list after inserting the data
+
+    SkipList.display();
+
+    // Searching for the key
+
+    SkipList.search(20);
+    SkipList.search(40);
+
+
+    // Deleting the key
+
+    SkipList.remove(20);
+    SkipList.remove(40);
+
+    // Display the skip list after removing the data
+
+    SkipList.display();
+    cout<<"Game:\n";
     GameScores game;
 
     // Add players
