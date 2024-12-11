@@ -1,9 +1,4 @@
-#include <iostream>
-#include <cstdlib>
-#include <cmath>
-#include <ctime>
-#include <vector>
-#include <unordered_map>
+#include <bits/stdc++.h>
 using namespace std;
 
 const int maxL = 4;
@@ -178,26 +173,7 @@ bool skipList::search(int data)
         return false;
     }
 }
-/*
-void skipList::display()
-{
 
-    cout << "skip List:"<< endl;
-
-    for (int i = level; i >= 0; i--) //
-    {
-        node* current = head->next[i]; // Initializes the pointer to the first node of that level
-
-        cout << "Level " << i << ": ";
-
-        while (current != nullptr)       // Start displaying all the values present at that level
-        {
-            cout << current->data << " ";
-            current = current->next[i]; // Moving to the right of the node
-        }
-        cout << endl;
-    }
-}*/
 void skipList::display() {
     for (int i = level; i >= 0; i--) { // Loop from the highest level to level 0
         cout << "Level " << i << ":   "; // Print the current level
@@ -220,6 +196,7 @@ class GameScores {
 private:
     skipList skipList; // Skip list to manage scores
     unordered_map<string, int> playerMap; // Maps player names to scores
+    multiset<int> scores; // To handle duplicate scores efficiently
 
 public:
     GameScores() : skipList() {}
@@ -232,44 +209,40 @@ public:
 };
 
 void GameScores::updateScore(string playerName, int newScore) {
-    // Remove the old score if the player exists
     if (playerMap.find(playerName) != playerMap.end()) {
         int oldScore = playerMap[playerName];
-        skipList.remove(oldScore); // Remove old score from skip list
+        scores.erase(scores.find(oldScore));
+        skipList.remove(oldScore);
     }
-
-    // Update the player's score
     playerMap[playerName] = newScore;
-
-    // Insert the new score into the skip list
+    scores.insert(newScore);
     skipList.insert(newScore);
-
     cout << "Player " << playerName << "'s score updated to " << newScore << endl;
 }
 
 vector<pair<string, int>> GameScores::getTopPlayers(int N) {
     vector<pair<string, int>> leaderboard;
-    node* current = skipList.head->next[0]; // Start from the highest score
-
-    while (current != nullptr && N > 0) {
-        for (auto& player : playerMap) {
-            if (player.second == current->data) {
-                leaderboard.push_back({player.first, current->data});
+    auto it = scores.rbegin(); // Access the highest scores
+    while (N > 0 && it != scores.rend()) {
+        for (const auto& player : playerMap) {
+            if (player.second == *it) {
+                leaderboard.emplace_back(player.first, player.second);
                 N--;
                 break;
             }
         }
-        current = current->next[0];
+        ++it;
     }
-
     return leaderboard;
 }
+
 void GameScores::addPlayer(string playerName, int initialScore) {
     if (playerMap.find(playerName) != playerMap.end()) {
         cout << "Player " << playerName << " is already in the game." << endl;
         return;
     }
     playerMap[playerName] = initialScore;
+    scores.insert(initialScore);
     skipList.insert(initialScore);
     cout << "Player " << playerName << " added with score " << initialScore << endl;
 }
@@ -280,6 +253,7 @@ void GameScores::removePlayer(string playerName) {
         return;
     }
     int score = playerMap[playerName];
+    scores.erase(scores.find(score));
     skipList.remove(score);
     playerMap.erase(playerName);
     cout << "Player " << playerName << " removed from the game." << endl;
@@ -288,12 +262,22 @@ void GameScores::removePlayer(string playerName) {
 int GameScores::getPlayerScore(string playerName) {
     if (playerMap.find(playerName) == playerMap.end()) {
         cout << "Player " << playerName << " not found in the game." << endl;
-        return -1; // Indicate that the player is not found
+        return -1;
     }
     return playerMap[playerName];
 }
-
+void Menu(){
+    cout << "\nMultiplayer Game Menu:\n "
+            "1. Add Player\n "
+            "2. Remove Player\n"
+            "3. Update Player Score\n"
+            "4. Get Player Score\n"
+            "5. Display Leaderboard\n"
+            "6. Exit\n";
+}
 int main() {
+    cout<<"Testing Skip List:\n";
+
     skipList SkipList; // Creating the skip List
 
     // Inserting the Data in skip list
@@ -322,8 +306,79 @@ int main() {
     // Display the skip list after removing the data
 
     SkipList.display();
-    cout<<"Game:\n";
+    cout<<"Testing Game:\n";
+    char continueGame = 'y'; // Variable to control termination of the game
+
     GameScores game;
+    while (continueGame == 'y' || continueGame == 'Y') {
+        int choice;
+        Menu();
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            // Add a player
+            string playerName;
+            int initialScore;
+            cout << "Enter player name: ";
+            cin >> playerName;
+            cout << "Enter initial score: ";
+            cin >> initialScore;
+            game.addPlayer(playerName, initialScore);
+        } else if (choice == 2) {
+            // Remove a player
+            string playerName;
+            cout << "Enter player name: ";
+            cin >> playerName;
+            game.removePlayer(playerName);
+        } else if (choice == 3) {
+            // Update a player's score
+            string playerName;
+            int newScore;
+            cout << "Enter player name: ";
+            cin >> playerName;
+            cout << "Enter new score: ";
+            cin >> newScore;
+            game.updateScore(playerName, newScore);
+        } else if (choice == 4) {
+            // Get a player's score
+            string playerName;
+            cout << "Enter player name: ";
+            cin >> playerName;
+            int score = game.getPlayerScore(playerName);
+            if (score != -1) {
+                cout << playerName << "'s score: " << score << endl;
+            }
+        } else if (choice == 5) {
+            // Display leaderboard
+            int N;
+            cout << "Enter the number of top players to display: ";
+            cin >> N;
+            vector<pair<string, int>> leaderboard = game.getTopPlayers(N);
+            cout << "Leaderboard:\n";
+            for (auto& player : leaderboard) {
+                cout << player.first << ": " << player.second << endl;
+            }
+        } else if (choice == 6) {
+            // Ask the user to confirm exiting
+            cout << "Are you sure you want to exit the game? (y/n): ";
+            char confirmExit;
+            cin >> confirmExit;
+            if (confirmExit == 'y' || confirmExit == 'Y') {
+                cout << "Exiting the game. Goodbye!\n";
+                break;
+            }
+        } else {
+            cout << "Invalid choice. Please try again.\n";
+        }
+
+        // Ask the user if they want to continue
+        cout << "Do you want to continue? (y/n): ";
+        cin >> continueGame;
+    }
+
+    cout << "Game terminated by the user. Goodbye!\n";
+    return 0;
 
     // Add players
     game.addPlayer("Alice", 1500);
