@@ -3,164 +3,9 @@
 #include <cmath>
 #include <ctime>
 #include <vector>
+#include <unordered_map>
 using namespace std;
-/*
-class Node {
-public:
-    int value;
-    Node** forward;
 
-    Node(int value, int level) {
-        this->value = value;
-        forward = new Node*[level + 1];
-        for (int i = 0; i <= level; i++) {
-            forward[i] = nullptr;
-        }
-    }
-
-    ~Node() {
-        delete[] forward;
-    }
-};
-
-class SkipList {
-private:
-    int maxLevel;
-    float probability;
-    int currentLevel;
-    Node* header;
-
-    int randomLevel() {
-        int level = 0;
-        while (((float)rand() / RAND_MAX) < probability && level < maxLevel) {
-            level++;
-        }
-        return level;
-    }
-
-public:
-    SkipList(int maxLevel, float probability) {
-        this->maxLevel = maxLevel;
-        this->probability = probability;
-        this->currentLevel = 0;
-        this->header = new Node(-1, maxLevel); // Header node with dummy value
-    }
-
-    ~SkipList() {
-        Node* current = header;
-        while (current != nullptr) {
-            Node* next = current->forward[0];
-            delete current;
-            current = next;
-        }
-    }
-
-    void insert(int value) {
-        Node* current = header;
-        Node* update[maxLevel + 1];
-        for (int i = currentLevel; i >= 0; i--) {
-            while (current->forward[i] != nullptr && current->forward[i]->value < value) {
-                current = current->forward[i];
-            }
-            update[i] = current;
-        }
-
-        current = current->forward[0];
-
-        if (current == nullptr || current->value != value) {
-            int newLevel = randomLevel();
-            if (newLevel > currentLevel) {
-                for (int i = currentLevel + 1; i <= newLevel; i++) {
-                    update[i] = header;
-                }
-                currentLevel = newLevel;
-            }
-
-            Node* newNode = new Node(value, newLevel);
-            for (int i = 0; i <= newLevel; i++) {
-                newNode->forward[i] = update[i]->forward[i];
-                update[i]->forward[i] = newNode;
-            }
-        }
-    }
-
-    void remove(int value) {
-        Node* current = header;
-        Node* update[maxLevel + 1];
-        for (int i = currentLevel; i >= 0; i--) {
-            while (current->forward[i] != nullptr && current->forward[i]->value < value) {
-                current = current->forward[i];
-            }
-            update[i] = current;
-        }
-
-        current = current->forward[0];
-
-        if (current != nullptr && current->value == value) {
-            for (int i = 0; i <= currentLevel; i++) {
-                if (update[i]->forward[i] != current) break;
-                update[i]->forward[i] = current->forward[i];
-            }
-            delete current;
-
-            while (currentLevel > 0 && header->forward[currentLevel] == nullptr) {
-                currentLevel--;
-            }
-        }
-    }
-
-    bool search(int value) {
-        Node* current = header;
-        for (int i = currentLevel; i >= 0; i--) {
-            while (current->forward[i] != nullptr && current->forward[i]->value < value) {
-                current = current->forward[i];
-            }
-        }
-
-        current = current->forward[0];
-        return current != nullptr && current->value == value;
-    }
-
-    void display() {
-        for (int i = 0; i <= currentLevel; i++) {
-            Node* node = header->forward[i];
-            cout << "Level " << i << ": ";
-            while (node != nullptr) {
-                cout << node->value << " ";
-                node = node->forward[i];
-            }
-            cout << endl;
-        }
-    }
-};
-
-int main() {
-    srand((unsigned)time(0));
-
-    SkipList list(5, 0.5);
-
-    list.insert(3);
-    list.insert(6);
-    list.insert(7);
-    list.insert(9);
-    list.insert(12);
-    list.insert(19);
-    list.insert(17);
-    list.insert(26);
-    list.insert(21);
-
-    cout << "Skip List after insertion:" << endl;
-    list.display();
-
-    cout << "\nSearching for 19: " << (list.search(19) ? "Found" : "Not Found") << endl;
-    cout << "Searching for 15: " << (list.search(15) ? "Found" : "Not Found") << endl;
-
-    list.remove(19);
-    cout << "\nSkip List after removing 19:" << endl;
-    list.display();
-
-    return 0;
-}*/
 const int maxL = 4;
 
 class node{
@@ -171,7 +16,6 @@ public:
 };
 class skipList {
 private:
-    node* head;
     int level;
 public:
     skipList();
@@ -181,6 +25,7 @@ public:
     bool search(int data);  // To search for a value
     void display();         // Function to display a skip List
 
+    node* head;
 };
 skipList:: skipList()
 {
@@ -368,38 +213,108 @@ void skipList::display() {
     }
 }
 
+////// game //////////////
+ // Include your skip list implementation
 
-int main()
-{
+class GameScores {
+private:
+    skipList skipList; // Skip list to manage scores
+    unordered_map<string, int> playerMap; // Maps player names to scores
 
-    skipList SkipList; // Creating the skip List
+public:
+    GameScores() : skipList() {}
 
-    // Inserting the Data in skip list
+    void updateScore(string playerName, int newScore);
+    vector<pair<string, int>> getTopPlayers(int N);
+    void addPlayer(string playerName, int initialScore);
+    void removePlayer(string playerName);
+    int getPlayerScore(string playerName);
+};
 
-    SkipList.insert(10);
-    SkipList.insert(20);
-    SkipList.insert(30);
-    SkipList.insert(40);
-    SkipList.insert(50);
+void GameScores::updateScore(string playerName, int newScore) {
+    // Remove the old score if the player exists
+    if (playerMap.find(playerName) != playerMap.end()) {
+        int oldScore = playerMap[playerName];
+        skipList.remove(oldScore); // Remove old score from skip list
+    }
 
-    // Display skip list after inserting the data
+    // Update the player's score
+    playerMap[playerName] = newScore;
 
-    SkipList.display();
+    // Insert the new score into the skip list
+    skipList.insert(newScore);
 
-    // Searching for the key
+    cout << "Player " << playerName << "'s score updated to " << newScore << endl;
+}
 
-    SkipList.search(20);
-    SkipList.search(40);
+vector<pair<string, int>> GameScores::getTopPlayers(int N) {
+    vector<pair<string, int>> leaderboard;
+    node* current = skipList.head->next[0]; // Start from the highest score
 
+    while (current != nullptr && N > 0) {
+        for (auto& player : playerMap) {
+            if (player.second == current->data) {
+                leaderboard.push_back({player.first, current->data});
+                N--;
+                break;
+            }
+        }
+        current = current->next[0];
+    }
 
-    // Deleting the key
+    return leaderboard;
+}
+void GameScores::addPlayer(string playerName, int initialScore) {
+    if (playerMap.find(playerName) != playerMap.end()) {
+        cout << "Player " << playerName << " is already in the game." << endl;
+        return;
+    }
+    playerMap[playerName] = initialScore;
+    skipList.insert(initialScore);
+    cout << "Player " << playerName << " added with score " << initialScore << endl;
+}
 
-    SkipList.remove(20);
-    SkipList.remove(40);
+void GameScores::removePlayer(string playerName) {
+    if (playerMap.find(playerName) == playerMap.end()) {
+        cout << "Player " << playerName << " not found in the game." << endl;
+        return;
+    }
+    int score = playerMap[playerName];
+    skipList.remove(score);
+    playerMap.erase(playerName);
+    cout << "Player " << playerName << " removed from the game." << endl;
+}
 
-    // Display the skip list after removing the data
+int GameScores::getPlayerScore(string playerName) {
+    if (playerMap.find(playerName) == playerMap.end()) {
+        cout << "Player " << playerName << " not found in the game." << endl;
+        return -1; // Indicate that the player is not found
+    }
+    return playerMap[playerName];
+}
 
-    SkipList.display();
+int main() {
+    GameScores game;
+
+    // Add players
+    game.addPlayer("Alice", 1500);
+    game.addPlayer("Bob", 1200);
+    game.addPlayer("Charlie", 1800);
+
+    // Update scores
+    game.updateScore("Alice", 1600);
+    game.updateScore("Bob", 1700);
+
+    // Get top players
+    vector<pair<string, int>> leaderboard = game.getTopPlayers(2);
+    cout << "Leaderboard:\n";
+    for (auto& player : leaderboard) {
+        cout << player.first << ": " << player.second << endl;
+    }
+
+    // Player management
+    cout << "Alice's score: " << game.getPlayerScore("Alice") << endl;
+    game.removePlayer("Alice");
 
     return 0;
 }
