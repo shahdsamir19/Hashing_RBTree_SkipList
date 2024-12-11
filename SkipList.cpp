@@ -11,6 +11,7 @@ public:
 };
 class skipList {
 private:
+    node* head;
     int level;
 public:
     skipList();
@@ -20,7 +21,6 @@ public:
     bool search(int data);  // To search for a value
     void display();         // Function to display a skip List
 
-    node* head;
 };
 skipList:: skipList()
 {
@@ -34,7 +34,6 @@ skipList:: skipList()
 void skipList::insert(int data)
 {
     int newLevel = 0;
-
 
     // Deciding the level of inserting node on the basis of coin toss
 
@@ -51,9 +50,7 @@ void skipList::insert(int data)
         level = newLevel;
     }
 
-
     node* current = head; // pointer to the head to traverse through the skip list
-
 
     vector<node*> Update(level + 1, nullptr); // To store the update node at eah level
 
@@ -101,8 +98,6 @@ void skipList::remove(int data)
     node* current = head; // start by setting a current pointer to the head node
 
     vector<node*> Update(level + 1, nullptr); // Create an update vector to store the updated node at each level, Remember only those nodes will be updated where the value to be deleted is present.
-
-
 
     for (int i = level; i >= 0; i--)
     {
@@ -173,7 +168,6 @@ bool skipList::search(int data)
         return false;
     }
 }
-
 void skipList::display() {
     for (int i = level; i >= 0; i--) { // Loop from the highest level to level 0
         cout << "Level " << i << ":   "; // Print the current level
